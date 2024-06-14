@@ -1,3 +1,4 @@
+import FormSubmitButton from "@/components/FormSubmitButton";
 import { prisma } from "@/lib/db/prisma";
 import { redirect } from "next/navigation";
 
@@ -55,9 +56,7 @@ const AddProductPage = () => {
           type="number"
           className="input input-bordered mb-3 w-full text-lg"
         />
-        <button type="submit" className="btn btn-primary btn-block">
-          Add Product
-        </button>
+        <FormSubmitButton className="btn-block">Add Product</FormSubmitButton>
       </form>
     </div>
   );
