@@ -17,17 +17,20 @@ const AddToCartButton = ({
   const [isPending, startTransition] = useTransition();
   const [success, setSuccess] = useState(false);
 
+  const handleClick = () => {
+    setSuccess(false);
+    startTransition(async () => {
+      await incrementProductQuantity(productId);
+      setSuccess(true);
+    });
+  };
+
   return (
     <div className="flex items-center gap-2">
       <button
         className="btn btn-primary"
-        onClick={() => {
-          setSuccess(false);
-          startTransition(async () => {
-            await incrementProductQuantity(productId);
-            setSuccess(true);
-          });
-        }}
+        onClick={handleClick}
+        disabled={isPending}
       >
         Add to Cart
         <svg
