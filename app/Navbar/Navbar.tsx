@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/public/assets/logo.svg";
+import githubLogo from "@/public/assets/github-logo.svg";
 import { redirect } from "next/navigation";
 import { getCart } from "@/lib/db/cart";
 import ShoppingCartButton from "./ShoppingCartButton";
@@ -33,6 +34,13 @@ const Navbar = async () => {
           </Link>
         </div>
         <div className="flex-none gap-2">
+          <Link
+            href="https://github.com/terminader7/ecommerce-app"
+            className="btn btn-ghost text-sm normal-case"
+          >
+            <Image src={githubLogo} height={20} width={20} alt="Github Logo" />
+            View the Code Here!
+          </Link>
           <form action={searchProducts}>
             <div className="form-control">
               <input
