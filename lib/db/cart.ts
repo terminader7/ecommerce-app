@@ -1,7 +1,7 @@
 import { cookies } from "next/dist/client/components/headers";
 import { prisma } from "./prisma";
 import { Cart, CartItem, Prisma } from "@prisma/client";
-import { authOptions } from "@/app/auth/authOptions";
+import { authOptions } from "@/lib/authOptions";
 import { getServerSession } from "next-auth";
 
 // Defining a type that represents a cart with its items and their associated products.
