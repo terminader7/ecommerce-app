@@ -2,7 +2,7 @@ import FormSubmitButton from "@/components/FormSubmitButton";
 import { prisma } from "@/lib/db/prisma";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/authOptions";
+import { authOptions } from "@/utils/authOptions";
 
 export const metadata = {
   title: "Add Product - Money Sink",
