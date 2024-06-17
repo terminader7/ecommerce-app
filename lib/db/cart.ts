@@ -1,6 +1,6 @@
 import { cookies } from "next/dist/client/components/headers";
 import { prisma } from "./prisma";
-import { Cart, Prisma } from "@prisma/client";
+import { Cart, CartItem, Prisma } from "@prisma/client";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 
@@ -23,6 +23,11 @@ export type ShoppingCart = CartWithProducts & {
   subtotal: number;
 };
 
+/**
+ * Retrieves the shopping cart with its items and associated products.
+ * Calculates the size (number of items) and subtotal (total price) of the cart.
+ * @returns The shopping cart with size and subtotal, or null if the cart is not found.
+ */
 export const getCart = async (): Promise<ShoppingCart | null> => {
   const session = await getServerSession(authOptions);
 
@@ -65,6 +70,12 @@ export const getCart = async (): Promise<ShoppingCart | null> => {
   };
 };
 
+/**
+ * Creates a new shopping cart.
+ * If the user is authenticated, associates the cart with the user.
+ * If the user is not authenticated, sets a localCartId cookie to identify the cart.
+ * @returns The newly created shopping cart.
+ */
 export const createCart = async (): Promise<ShoppingCart> => {
   const session = await getServerSession(authOptions);
 
@@ -87,11 +98,89 @@ export const createCart = async (): Promise<ShoppingCart> => {
   // Create a new cart in the database
 
   // Needs encryption, this won't be okay for production
-
   return {
     ...newCart,
     items: [],
     size: 0,
     subtotal: 0,
   };
+};
+
+/**
+ * Merges the items from an anonymous cart into a user's cart.
+ * @param userId - The ID of the user's cart to merge into.
+ */
+export const mergeAnonymousCartIntoUserCart = async (userId: string) => {
+  const localCartId = cookies().get("localCartId")?.value;
+
+  const localCart = localCartId
+    ? await prisma.cart.findUnique({
+        where: { id: localCartId },
+        include: { items: true },
+      })
+    : null;
+
+  if (!localCart) return;
+
+  const userCart = await prisma.cart.findFirst({
+    where: { userId },
+    include: { items: true },
+  });
+
+  await prisma.$transaction(async (tx) => {
+    if (userCart) {
+      const mergedCartItems = mergeCartItems(localCart.items, userCart.items);
+
+      await tx.cartItem.deleteMany({
+        where: { cartId: userCart.id },
+      });
+
+      await tx.cartItem.createMany({
+        data: mergedCartItems.map((item) => ({
+          cartId: userCart.id,
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      });
+    } else {
+      await tx.cart.create({
+        data: {
+          userId,
+          items: {
+            createMany: {
+              data: localCart.items.map((item) => ({
+                productId: item.productId,
+                quantity: item.quantity,
+              })),
+            },
+          },
+        },
+      });
+    }
+
+    await tx.cart.delete({ where: { id: localCart.id } });
+
+    cookies().set("localCartId", "");
+  });
+};
+
+/**
+ * Merges multiple arrays of cart items into a single array.
+ * If an item with the same productId already exists, the quantities are summed.
+ * @param cartItems - Arrays of cart items to merge.
+ * @returns The merged array of cart items.
+ */
+const mergeCartItems = (...cartItems: CartItem[][]): CartItem[] => {
+  return cartItems.reduce((acc, items) => {
+    items.forEach((item) => {
+      const existingItem = acc.find((i) => i.productId === item.productId);
+
+      if (existingItem) {
+        existingItem.quantity += item.quantity;
+      } else {
+        acc.push(item);
+      }
+    });
+    return acc;
+  }, [] as CartItem[]);
 };
