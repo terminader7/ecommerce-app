@@ -4,6 +4,17 @@ const gloablForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-export const prisma = gloablForPrisma.prisma ?? new PrismaClient();
+const prismaBase = gloablForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") gloablForPrisma.prisma = prisma;
+export const prisma = prismaBase.$extends({
+  query: {
+    cart: {
+      async update({ args, query }) {
+        args.data = { ...args.data, updatedAt: new Date() };
+        return query(args);
+      },
+    },
+  },
+});
+
+if (process.env.NODE_ENV !== "production") gloablForPrisma.prisma = prismaBase;
