@@ -1,9 +1,18 @@
 import ProductCard from "@/components/ProductCard";
 import { prisma } from "@/lib/db/prisma";
+import { Metadata } from "next";
 
 interface SearchPageProps {
   searchParams: { query: string };
 }
+
+export const generateMetadata = ({
+  searchParams: { query },
+}: SearchPageProps): Metadata => {
+  return {
+    title: `Search: ${query} - Money Sink`,
+  };
+};
 
 const SearchPage = async ({ searchParams: { query } }: SearchPageProps) => {
   const products = await prisma.product.findMany({
