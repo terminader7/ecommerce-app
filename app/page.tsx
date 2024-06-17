@@ -3,19 +3,23 @@ import ProductCard from "@/components/ProductCard";
 import { prisma } from "@/lib/db/prisma";
 import Image from "next/image";
 import Link from "next/link";
-import { GetServerSideProps } from "next";
 
 interface HomeProps {
   searchParams: { page: string };
 }
 
-// Fetching data on the server side for better SEO and initial load performance
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const page = context.query.page || "1";
-  const currentPage = parseInt(page as string);
+export default async function Home({
+  searchParams: { page = "1" },
+}: HomeProps) {
+  // Page we're currently on
+  const currentPage = parseInt(page);
+  // Items allowed on each page grid
   const pageSize = 6;
+  // Count of featured item on 1st page
   const heroItemCount = 1;
+  // Amount of items we have in db
   const totalItemCount = await prisma.product.count();
+  // Calculating how many pages need for pagination
   const totalPages = Math.ceil((totalItemCount - heroItemCount) / pageSize);
 
   const products = await prisma.product.findMany({
@@ -27,25 +31,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     take: pageSize + (currentPage === 1 ? heroItemCount : 0),
   });
 
-  return {
-    props: {
-      products,
-      currentPage,
-      totalPages,
-    },
-  };
-};
-
-interface HomeProps {
-  products: any[]; // Define a more specific type for your products
-  currentPage: number;
-  totalPages: number;
-}
-
-export default function Home({ products, currentPage, totalPages }: HomeProps) {
   return (
     <div className="flex flex-col items-center">
-      {currentPage === 1 && products.length > 0 && (
+      {currentPage === 1 && (
         <div className="hero rounded-xl bg-base-200">
           <div className="hero-content flex-col lg:flex-row">
             <Image
