@@ -11,11 +11,15 @@ interface HomeProps {
 export default async function Home({
   searchParams: { page = "1" },
 }: HomeProps) {
+  // Page we're currently on
   const currentPage = parseInt(page);
+  // Items allowed on each page grid
   const pageSize = 6;
+  // Count of featured item on 1st page
   const heroItemCount = 1;
+  // Amount of items we have in db
   const totalItemCount = await prisma.product.count();
-
+  // Calculating how many pages need for pagination
   const totalPages = Math.ceil((totalItemCount - heroItemCount) / pageSize);
 
   const products = await prisma.product.findMany({
