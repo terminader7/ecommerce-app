@@ -23,7 +23,11 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async signIn({ user }) {
-      await mergeAnonymousCartIntoUserCart(user.id);
+      try {
+        await mergeAnonymousCartIntoUserCart(user.id);
+      } catch (error) {
+        console.error("Failed to merge anonymous cart into user cart:", error);
+      }
     },
   },
 };
