@@ -1,5 +1,6 @@
 import { getCart } from "@/lib/db/cart";
 import CartEntry from "./CartEntry";
+import { formatPrice } from "@/lib/format";
 
 export const metadata = {
   title: "Your Cart - Money Sink",
@@ -14,6 +15,13 @@ const CartPage = async () => {
       {cart?.items.map((cartItem) => (
         <CartEntry cartItem={cartItem} key={cartItem.id} />
       ))}
+      {!cart?.items.length && <p>Your cart is empty.</p>}
+      <div className="flex flex-col items-end sm:items-center">
+        <p className="mb-3 font-bold">
+          Total: {formatPrice(cart?.subtotal || 0)}
+        </p>
+        <button className="btn btn-primary sm:w-[200px]">Checkout</button>
+      </div>
     </div>
   );
 };
