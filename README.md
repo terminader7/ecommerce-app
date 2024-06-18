@@ -1,6 +1,5 @@
 # Ecommerce App
-
-This repository contains the source code for a feature-rich eCommerce application developed with Next.js, TypeScript, Daisy UI, Prisma, Zod, Tailwind CSS, and utilizing Google Sign-In for user authentication. The app showcases modern web development techniques and technologies, offering functionalities like user authentication, cart management, product addition, search functionality, pagination, and more. It serves as both a practical tool and a learning resource for developers interested in these technologies.
+ eCommerce application developed with Next.js, TypeScript, Daisy UI, Prisma, Zod, Tailwind CSS, and utilizing Google Sign-In for user authentication. The app showcases modern web development techniques and technologies, offering functionalities like user authentication, cart management, product addition, search functionality, pagination, and more. It serves as both a practical tool and a learning resource for developers interested in these technologies.
 
 ## Key Features
 
