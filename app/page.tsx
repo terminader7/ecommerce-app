@@ -46,6 +46,7 @@ export default async function Home({
             />
             <div>
               <h1 className="text-5xl font-bold">{products[0].name}</h1>
+              <div className="badge badge-accent font-bold">Featured</div>
               <p className="py-6">{products[0].description}</p>
               <Link
                 href={"/products/" + products[0].id}
